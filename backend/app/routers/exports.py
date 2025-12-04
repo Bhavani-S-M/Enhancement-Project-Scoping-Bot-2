@@ -165,7 +165,7 @@ async def _fetch_related_case_study(project_id: uuid.UUID, db: AsyncSession) -> 
                 .where(models.PendingGeneratedCaseStudy.status == "pending")
                 .order_by(models.PendingGeneratedCaseStudy.created_at.desc())
             )
-            existing_pending = existing_result.scalar_one_or_none()
+            existing_pending = existing_result.scalars().first()  # Get most recent pending case study
 
             if existing_pending:
                 # Return existing pending case study instead of generating new one
