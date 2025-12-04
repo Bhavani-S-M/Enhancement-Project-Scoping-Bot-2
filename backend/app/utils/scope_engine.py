@@ -134,6 +134,13 @@ def _repair_json(text: str) -> str:
     # Only match at start of line or after { or , to avoid false positives
     text = re.sub(r'([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:', r'\1"\2":', text)
 
+    # Fix missing colon between key and value: "key" "value" -> "key": "value"
+    # Match quoted key followed by whitespace and quoted value without colon
+    text = re.sub(r'("[^"]+")(\s+)("[^"]+"|{|\[)', r'\1:\3', text)
+
+    # Fix missing colon after quoted key: "key"{  -> "key": {
+    text = re.sub(r'("[^"]+")(\s*)([{[])', r'\1:\3', text)
+
     return text
 
 
