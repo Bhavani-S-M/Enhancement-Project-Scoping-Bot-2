@@ -57,6 +57,21 @@ async def create_project(
             detail="At least one project field or file must be provided."
         )
 
+    # Auto-generate project name from first uploaded file if not provided
+    if not name and files and len(files) > 0:
+        first_file = files[0]
+        if first_file.filename:
+            # Remove file extension and clean up the filename
+            import os
+            base_name = os.path.splitext(first_file.filename)[0]
+            # Replace underscores and special chars with spaces, clean up
+            name = base_name.replace('_', ' ').replace('-', ' ')
+            # Remove multiple spaces
+            name = ' '.join(name.split())
+            # Limit length to 100 characters
+            name = name[:100] if len(name) > 100 else name
+            logger.info(f"📝 Auto-generated project name from file: '{name}'")
+
     if company_id:
         from app.utils import ratecards
         sigmoid = await ratecards.get_or_create_sigmoid_company(db)
