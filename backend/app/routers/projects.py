@@ -180,6 +180,20 @@ async def generate_project_scope_route(
     if not db_project:
         raise HTTPException(status_code=404, detail="Project not found")
 
+    # Validate company is set
+    if not getattr(db_project, "company_id", None):
+        raise HTTPException(
+            status_code=400,
+            detail="Company must be set before generating scope. Please select a company for this project."
+        )
+
+    # Validate project has a name
+    if not getattr(db_project, "name", None) or not db_project.name.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Project name is required before generating scope. Please provide a project name."
+        )
+
     # Generate full scope (includes architecture)
     scope = await scope_engine.generate_project_scope(db, db_project) or {}
 
@@ -305,6 +319,20 @@ async def generate_project_questions_route(
     db_project = await projects.get_project(db, project_id=project_id, owner_id=current_user.id)
     if not db_project:
         raise HTTPException(status_code=404, detail="Project not found")
+
+    # Validate company is set
+    if not getattr(db_project, "company_id", None):
+        raise HTTPException(
+            status_code=400,
+            detail="Company must be set before generating questions. Please select a company for this project."
+        )
+
+    # Validate project has a name
+    if not getattr(db_project, "name", None) or not db_project.name.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Project name is required before generating questions. Please provide a project name."
+        )
 
     try:
         # Generate categorized questions
